@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finanzas</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c4a7a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Finanzas">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f2f4f1;--panel:#fff;--ink:#16221d;--mute:#66736c;--line:#dde3de;--in:#1d7a4b;--out:#c0432e;--acc:#2c4a7a;--accbg:#e6ecf5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111815;--panel:#1a231f;--ink:#e8eee9;--mute:#93a29a;--line:#2b3832;--in:#4cc388;--out:#f07a62;--acc:#8fb0e6;--accbg:#223049}}
+:root[data-theme="dark"]{--bg:#111815;--panel:#1a231f;--ink:#e8eee9;--mute:#93a29a;--line:#2b3832;--in:#4cc388;--out:#f07a62;--acc:#8fb0e6;--accbg:#223049}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,.big{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+h1{font-size:26px;font-weight:700}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+label{display:flex;flex-direction:column;font-size:13px;color:var(--mute);gap:4px;font-weight:500}
+input,select,button{font:inherit;color:var(--ink)}
+input,select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-height:40px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:9px 14px;min-height:40px;cursor:pointer;font-weight:600;color:var(--mute)}
+.seg button[aria-pressed=true]{background:var(--acc);color:var(--bg)}
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px}
+.hero .lbl{color:var(--mute);font-size:14px}
+.big{font-size:clamp(34px,8vw,52px);font-weight:700;line-height:1.1;margin:4px 0}
+.sub{color:var(--mute)}
+.row3{display:flex;flex-wrap:wrap;gap:8px 32px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.row3 b{font-family:system-ui,sans-serif;font-size:20px}
+.in{color:var(--in)}.out{color:var(--out)}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+h2{font-size:18px;margin-bottom:12px}
+form{display:grid;gap:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.go{background:var(--acc);color:var(--bg);border:0;border-radius:8px;padding:11px;font-weight:600;cursor:pointer;min-height:44px}
+.cat{margin-bottom:12px}
+.cat .t{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.bar{height:8px;border-radius:4px;background:var(--accbg);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--out)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+li:last-child{border:0}
+li .d{font-weight:500}li small{color:var(--mute);display:block}
+li .r{text-align:right;white-space:nowrap}
+.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:18px;padding:6px;min-width:36px;min-height:36px}
+.empty{color:var(--mute);padding:8px 0}
+.stack{display:grid;gap:20px}
+[hidden]{display:none!important}
+.tabs{margin-bottom:20px;max-width:440px}.tabs button{flex:1}
+.inv{padding:14px 0;border-bottom:1px solid var(--line)}.inv:last-child{border:0}
+.inv .h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.inv .st{margin:8px 0 4px;font-size:14px}
+.inv .bar i{background:var(--in)}
+.rl{font-size:13px;color:var(--mute);margin-top:6px}
+.rl div{display:flex;justify-content:space-between;align-items:center}
+.rf{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.rf .go{grid-column:1/3}
+.mini{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 12px;min-height:40px;cursor:pointer;font-weight:600;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>Mis finanzas</h1><div class="sub" id="st" style="font-size:13px" aria-live="polite">Cargando…</div><div class="sub" id="tInfo" style="font-size:13px"></div><div class="sub" id="sp" style="font-size:13px"></div><div class="bar" style="max-width:260px;margin-top:4px" role="progressbar" aria-label="Espacio usado"><i id="spb" style="background:var(--acc);width:1%"></i></div><div class="ctl" style="margin-top:8px"><button type="button" class="mini" id="bkE">Exportar respaldo</button><button type="button" class="mini" id="bkI">Importar respaldo</button><input type="file" id="bkF" accept="application/json,.json" hidden></div></div>
+  <div class="ctl">
+    <label>Mes<input type="month" id="mes"></label>
+    <label>Tasa BCV de hoy (Bs por $1)<input type="number" id="tasa" step="any" min="0" inputmode="decimal"></label>
+    <button type="button" class="mini" id="bcv">Actualizar tasa BCV</button>
+    <div class="seg" role="group" aria-label="Moneda de visualización">
+      <button id="vUSD" aria-pressed="true">USD</button><button id="vVES" aria-pressed="false">Bs</button>
+    </div>
+  </div>
+</header>
+
+<div class="seg tabs" role="group" aria-label="Sección">
+  <button id="tabG" aria-pressed="true">Gastos</button><button id="tabI" aria-pressed="false">Inversiones</button><button id="tabC" aria-pressed="false">Cuentas</button>
+</div>
+<div id="vG">
+<section class="hero">
+  <div class="lbl">Balance del mes</div>
+  <div class="big" id="bal">—</div>
+  <div class="sub" id="balAlt"></div>
+  <div class="row3">
+    <div><span class="sub">Ingresos</span><br><b class="in" id="ing">—</b></div>
+    <div><span class="sub">Gastos</span><br><b class="out" id="gas">—</b></div>
+  </div>
+  <div class="row3">
+    <div><span class="sub">Disponible en mis cuentas en Bs</span><br><b id="gBs">—</b></div>
+    <div><span class="sub">Disponible en $ y efectivo</span><br><b id="gUsd">—</b></div>
+    <div><span class="sub">Todo junto equivale a</span><br><b id="gAll">—</b></div>
+  </div>
+</section>
+
+<div class="grid">
+  <section class="panel">
+    <h2>Nuevo movimiento</h2>
+    <form id="f">
+      <div class="seg" role="group" aria-label="Tipo">
+        <button type="button" id="tG" aria-pressed="true" style="flex:1">Gasto</button>
+        <button type="button" id="tI" aria-pressed="false" style="flex:1">Ingreso</button>
+      </div>
+      <div class="two">
+        <label>Monto<input type="number" id="monto" step="0.01" min="0.01" inputmode="decimal" required></label>
+        <label>Moneda<select id="mon"><option value="USD">Dólares ($)</option><option value="VES">Bolívares (Bs)</option></select></label>
+      </div>
+      <div class="sub" id="eq" style="font-size:14px;margin-top:-4px" aria-live="polite"></div>
+      <label>Cuenta o efectivo<select id="tAcc"></select></label>
+      <label id="pmL">Método de pago<select id="pm"><option value="">Efectivo, tarjeta u otro</option><option value="p2p">Pago móvil a una persona</option><option value="p2c">Pago móvil a un comercio</option></select></label>
+      <label>Categoría<select id="cat"></select></label>
+      <label>Descripción<input id="desc" maxlength="60" placeholder="Ej: mercado, gasolina"></label>
+      <label>Fecha<input type="date" id="fecha" required></label>
+      <button class="go" type="submit">Guardar movimiento</button>
+    </form>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <h2>En qué gasté</h2>
+      <div id="cats"></div>
+    </section>
+    <section class="panel">
+      <h2>Movimientos</h2>
+      <ul id="lista"></ul>
+    </section>
+  </div>
+</div>
+<section class="panel" style="margin-top:20px"><h2>Historial de tasas (Bs por $1)</h2>
+<ul id="rates"></ul>
+<form id="fr" class="rf"><input type="date" id="rDate" required aria-label="Fecha de la tasa"><input type="number" id="rVal" step="any" min="0.0001" required placeholder="Tasa" aria-label="Tasa"><button class="go" type="submit">Guardar tasa de esa fecha</button></form>
+</section>
+</div>
+
+<div id="vI" hidden>
+<section class="hero">
+  <div class="lbl">Ganancia o pérdida neta de mis inversiones</div>
+  <div class="big" id="iNet">—</div>
+  <div class="sub" id="iAlt"></div>
+  <div class="row3">
+    <div><span class="sub">Invertido</span><br><b id="iInv">—</b></div>
+    <div><span class="sub">Total retornado</span><br><b class="in" id="iRet">—</b></div>
+    <div><span class="sub">Ganancia</span><br><b class="in" id="iGan">—</b></div>
+    <div><span class="sub">Por reponer</span><br><b class="out" id="iRep">—</b></div>
+    <div><span class="sub">Rendimiento</span><br><b id="iRoi">—</b></div>
+  </div>
+</section>
+<div class="grid">
+  <section class="panel">
+    <h2>Nueva inversión</h2>
+    <form id="fi">
+      <label>Nombre<input id="iNom" maxlength="60" required placeholder="Ej: equipo de ultrasonido, stock de alimento"></label>
+      <div class="two">
+        <label>Monto invertido<input type="number" id="iMon" step="0.01" min="0.01" inputmode="decimal" required></label>
+        <label>Moneda<select id="iCur"><option value="USD">Dólares ($)</option><option value="VES">Bolívares (Bs)</option></select></label>
+      </div>
+      <div class="sub" id="iEq" style="font-size:14px;margin-top:-4px" aria-live="polite"></div>
+      <label>Fecha<input type="date" id="iFec" required></label>
+      <label>Nota (opcional)<input id="iNota" maxlength="120" placeholder="Proveedor, plan de recuperación…"></label>
+      <button class="go" type="submit">Guardar inversión</button>
+    </form>
+  </section>
+  <section class="panel"><h2>Mis inversiones</h2><div id="invs"></div></section>
+</div>
+</div>
+
+<div id="vC" hidden>
+<section class="hero">
+  <div class="lbl">Total en mis cuentas en bolívares</div>
+  <div class="big" id="cBs">—</div>
+  <div class="row3">
+    <div><span class="sub">En dólares y efectivo ($)</span><br><b id="cUsd">—</b></div>
+    <div><span class="sub">Todo junto equivale a</span><br><b id="cAll">—</b></div>
+  </div>
+</section>
+<div class="grid">
+  <section class="panel">
+    <h2>Nueva cuenta</h2>
+    <form id="fc">
+      <label>Nombre<input id="cNom" maxlength="40" required placeholder="Ej: Banco Mercantil, Efectivo"></label>
+      <div class="two">
+        <label>Moneda<select id="cCur"><option value="VES">Bolívares (Bs)</option><option value="USD">Dólares ($)</option></select></label>
+        <label>Saldo actual<input type="number" id="cIni" step="0.01" value="0" inputmode="decimal" required></label>
+      </div>
+      <label>Mantenimiento mensual que cobra el banco (opcional)<input type="number" id="cMan" step="0.01" min="0" value="0" inputmode="decimal"></label>
+      <button class="go" type="submit">Guardar cuenta</button>
+    </form>
+  </section>
+  <section class="panel"><h2>Mis cuentas</h2><div id="accs"></div></section>
+</div>
+<div class="grid" style="margin-top:20px">
+ <div class="stack">
+  <section class="panel"><h2>Transferir entre mis cuentas</h2>
+   <form id="ft">
+    <div class="two"><label>Desde<select id="tfFrom"></select></label><label>Hacia<select id="tfTo"></select></label></div>
+    <div class="two"><label>Monto que sale<input type="number" id="tfMon" step="0.01" min="0.01" required inputmode="decimal"></label><label>Monto que llega<input type="number" id="tfRec" step="0.01" min="0.01" inputmode="decimal" placeholder="Automático"></label></div>
+    <div class="sub" id="tfEq" style="font-size:14px" aria-live="polite"></div>
+    <label>Fecha<input type="date" id="tfFec" required></label>
+    <button class="go" type="submit">Transferir</button>
+   </form></section>
+  <section class="panel"><h2>Préstamo o devolución</h2>
+   <form id="fl">
+    <label>Persona<input id="lPer" maxlength="40" required placeholder="Ej: esposa"></label>
+    <label>¿Qué pasó?<select id="lDir"><option value="recibi">Me prestó (me entró dinero)</option><option value="devuelvo">Yo le devuelvo</option><option value="preste">Le presté (me salió dinero)</option><option value="me_devuelven">Me devuelve</option></select></label>
+    <label>Cuenta o efectivo<select id="lAcc"></select></label>
+    <div class="two"><label>Monto<input type="number" id="lMon" step="0.01" min="0.01" required inputmode="decimal"></label><label>Moneda<select id="lCur"><option value="VES">Bs</option><option value="USD">$</option></select></label></div>
+    <label>Fecha<input type="date" id="lFec" required></label>
+    <button class="go" type="submit">Guardar</button>
+   </form></section>
+ </div>
+ <div class="stack">
+  <section class="panel"><h2>Quién te debe y a quién le debes</h2><div id="debts"></div></section>
+  <section class="panel"><h2>Historial de transferencias y préstamos</h2><ul id="movs"></ul></section>
+  <section class="panel"><h2>Comisión de pago móvil</h2>
+   <p class="sub" style="margin:0 0 10px;font-size:14px">Topes del BCV (Gaceta Oficial del 31/07/2026): hasta 0,30% entre personas con mínimo de Bs 14, y hasta 1,50% a comercios. Cada gasto por pago móvil suma su comisión solo.</p>
+   <form id="fm" class="rf"><label>A personas (%)<input id="cmP" type="number" step="0.01" min="0" required></label><label>A comercios (%)<input id="cmC" type="number" step="0.01" min="0" required></label><label>Mínimo (Bs)<input id="cmM" type="number" step="0.01" min="0" required></label><button class="go" type="submit">Guardar comisiones</button></form>
+  </section>
+ </div>
+</div>
+</div>
+
+<script>
+const GAS=["Comida","Transporte","Servicios","Vivienda","Salud","Mascotas","Educación","Ocio","Negocio","Comisiones","Otros"];
+const ING=["Sueldo","Negocio","Otros ingresos"];
+const COMD={p2p:0.3,p2c:1.5,min:14};
+let S={rate:0,rates:{},acc:[],mov:[],com:{...COMD},tx:[],inv:[],ret:[],view:"USD"},tipo="gasto";
+const $=id=>document.getElementById(id);
+let col=null;
+function loadLocal(){try{const r=localStorage.getItem("fin_v1");if(r)return JSON.parse(r)}catch(e){}return null}
+function saveLocal(){try{localStorage.setItem("fin_v1",JSON.stringify(S))}catch(e){setStatus("No hay espacio para guardar más. Exporta un respaldo y borra datos viejos.",1)}}
+function saveSettings(){if(col)col.doc("settings").set({rate:S.rate,view:S.view,com:S.com}).catch(()=>setStatus("No se pudo guardar. Revisa tu conexión.",1));else saveLocal()}
+function addTx(t){withBoth(t);S.tx.push(t);if(col)col.doc("t"+t.id).set(t).catch(()=>setStatus("No se pudo guardar. Revisa tu conexión.",1));else saveLocal()}
+function delTx(id){id=+id;const ids=[id,...S.tx.filter(t=>t.parent==id).map(t=>t.id)];S.tx=S.tx.filter(t=>!ids.includes(t.id)&&t.parent!=id);if(col)ids.forEach(k=>col.doc("t"+k).delete().catch(()=>setStatus("No se pudo eliminar.",1)));else saveLocal()}
+function putDoc(pre,o){if(o.amount!=null&&o.cur)withBoth(o);if(col)col.doc(pre+o.id).set(o).catch(()=>setStatus("No se pudo guardar. Revisa tu conexión.",1));else saveLocal()}
+function rmDoc(pre,id){if(col)col.doc(pre+id).delete().catch(()=>setStatus("No se pudo eliminar.",1));else saveLocal()}
+function rateFor(d){let r=0;const k=Object.keys(S.rates).sort();for(const x of k){if(x<=d)r=S.rates[x].r}if(!r&&k.length)r=S.rates[k[0]].r;return r||S.rate||0}
+function setRate(d,r,src){S.rates[d]={r,src};if(col)col.doc("d"+d).set({date:d,rate:r,src}).catch(()=>setStatus("No se pudo guardar la tasa.",1));else saveLocal();render()}
+const nr=n=>n.toLocaleString("es-VE",{minimumFractionDigits:2,maximumFractionDigits:4});
+const eqs=x=>x.cur==="USD"?fmt(x.amount*x.rate,"VES"):fmt(x.amount/x.rate,"USD");
+function withBoth(o){o.usd=o.cur==="USD"?o.amount:o.amount/o.rate;o.bs=o.cur==="VES"?o.amount:o.amount*o.rate;return o}
+function spBar(q){const b=$("spb");b.style.width=Math.min(Math.max(q,1),100)+"%";b.style.background=q>80?"var(--out)":"var(--acc)";b.parentNode.setAttribute("aria-valuenow",Math.round(q))}
+function syncRate(){{const q=JSON.stringify(S).length/50000;$("sp").textContent="Espacio usado: "+num(q)+"% del espacio de este teléfono para la app";spBar(q)}
+  const hd=hoy();if(document.activeElement!==$("tasa"))$("tasa").value=rateFor(hd)||"";
+  const ks=Object.keys(S.rates).sort(),lk=ks.filter(x=>x<=hd).pop();
+  $("tInfo").textContent=lk?`Tasa del ${lk.split("-").reverse().join("/")} · ${S.rates[lk].src==="BCV"?"BCV":"manual"}`:"Aún sin tasa registrada";
+  $("rates").innerHTML=ks.length?ks.reverse().slice(0,15).map(d=>`<li><span>${d.split("-").reverse().join("/")}</span><span>${nr(S.rates[d].r)} Bs · ${S.rates[d].src==="BCV"?"BCV":"manual"}</span></li>`).join(""):'<li class="empty">Todavía no hay tasas guardadas.</li>';
+}
+function eq(m,c,d,out){const a=parseFloat($(m).value),k=$(c).value,r=rateFor($(d).value);
+  $(out).textContent=a>0&&r>0?"Equivale a "+(k==="USD"?fmt(a*r,"VES"):fmt(a/r,"USD"))+" (tasa "+nr(r)+")":""}
+function stat(){setStatus("Datos guardados en este teléfono · último respaldo: "+(S.bk?S.bk.split("-").reverse().join("/"):"nunca"))}
+async function bcv(auto){
+  try{const r=await fetch("https://ve.dolarapi.com/v1/dolares/oficial",{cache:"no-store"});const j=await r.json();const v=parseFloat(j.promedio),last=rateFor(hoy());
+    if(!(v>0)||(last>0&&Math.abs(v/last-1)>0.3))throw 0;
+    setRate(hoy(),v,"BCV");setStatus("Tasa BCV actualizada: "+nr(v)+" Bs")}
+  catch(e){if(!auto)say("No pude consultar la tasa ahora (sin internet o el servicio no responde). Escríbela a mano en el campo de la tasa.")}}
+function bcvAuto(){if(navigator.onLine&&!S.rates[hoy()])bcv(true)}
+function dlg(msg,o){return new Promise(res=>{
+  const w=document.createElement("div");w.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:99";
+  w.innerHTML=`<div role="dialog" aria-modal="true" style="background:var(--panel);color:var(--ink);border-radius:12px;padding:18px;max-width:380px;width:100%;display:grid;gap:12px"><div>${esc(msg)}</div>${o.input?`<input id="dI" type="text" inputmode="decimal" value="${esc(o.def==null?"":o.def)}">`:""}<div style="display:flex;gap:8px;justify-content:flex-end">${o.cancel?'<button id="dN" style="padding:8px 16px;background:var(--accbg);color:var(--ink);border:0;border-radius:8px;cursor:pointer;font-weight:600">Cancelar</button>':""}<button class="go" id="dY" style="padding:8px 16px">Aceptar</button></div></div>`;
+  document.body.appendChild(w);const i=w.querySelector("#dI"),y=w.querySelector("#dY"),n=w.querySelector("#dN"),end=v=>{w.remove();res(v)};
+  y.onclick=()=>end(i?i.value:true);if(n)n.onclick=()=>end(i?null:false);
+  if(i){i.focus();i.select();i.onkeydown=e=>{if(e.key==="Enter")y.click()}}else y.focus()})}
+const say=m=>dlg(m,{}),sure=m=>dlg(m,{cancel:1}),askv=(m,d)=>dlg(m,{input:1,cancel:1,def:d});
+function setStatus(m,bad){const e=$("st");e.textContent=m;e.style.color=bad?"var(--out)":"var(--mute)"}
+const hoy=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=n=>n.toLocaleString("es-VE",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=(n,c)=>(c==="USD"?"$ ":"Bs ")+num(n);
+// Convierte con la tasa vigente cuando se registró el movimiento
+function conv(t,to){if(t.cur===to)return t.amount;return to==="USD"?t.amount/t.rate:t.amount*t.rate}
+function cats(){$("cat").innerHTML=(tipo==="gasto"?GAS:ING).map(c=>`<option>${c}</option>`).join("")}
+function setTipo(t){tipo=t;$("pmL").hidden=t!=="gasto";if(t!=="gasto")$("pm").value="";$("tG").setAttribute("aria-pressed",t==="gasto");$("tI").setAttribute("aria-pressed",t==="ingreso");cats()}
+function render(){syncRate();
+  const v=S.view,o=v==="USD"?"VES":"USD",m=$("mes").value;
+  $("vUSD").setAttribute("aria-pressed",v==="USD");$("vVES").setAttribute("aria-pressed",v==="VES");
+  const L=S.tx.filter(t=>t.date.startsWith(m)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  let i=0,g=0,io=0,go=0;const por={};
+  L.forEach(t=>{const a=conv(t,v),b=conv(t,o);if(t.tipo==="ingreso"){i+=a;io+=b}else{g+=a;go+=b;por[t.cat]=(por[t.cat]||0)+a}});
+  $("bal").textContent=fmt(i-g,v);$("bal").className="big "+(i-g<0?"out":"");
+  $("balAlt").textContent="≈ "+fmt(io-go,o)+" a las tasas de cada movimiento";
+  $("ing").textContent=fmt(i,v);$("gas").textContent=fmt(g,v);
+  const e=Object.entries(por).sort((a,b)=>b[1]-a[1]);
+  $("cats").innerHTML=e.length?e.map(([c,x])=>`<div class="cat"><div class="t"><span>${esc(c)}</span><span>${fmt(x,v)} · ${Math.round(x/g*100)}%</span></div><div class="bar"><i style="width:${x/e[0][1]*100}%"></i></div></div>`).join(""):'<div class="empty">Aún no hay gastos este mes. Registra el primero en el formulario.</div>';
+  $("lista").innerHTML=L.length?L.map(t=>`<li><div><span class="d">${esc(t.desc||t.cat)}</span><small>${t.date.split("-").reverse().join("/")} · ${esc(t.cat)}${accN(t)} · ${fmt(t.amount,t.cur)} ≈ ${eqs(t)} (tasa ${nr(t.rate)})</small></div><div class="r ${t.tipo==="ingreso"?"in":"out"}">${t.tipo==="ingreso"?"+":"−"}${fmt(conv(t,v),v)}<button class="x" data-id="${t.id}" aria-label="Eliminar movimiento">×</button></div></li>`).join(""):'<li class="empty">Sin movimientos en este mes.</li>';
+  renderInv();renderAcc();fillAcc();renderMov();
+}
+// El efectivo es una cuenta más (una en Bs y otra en $); lo que antes quedó "sin cuenta" pasa a efectivo
+function ensureCash(){let ch=0;
+  [{id:1,name:"Efectivo (Bs)",cur:"VES"},{id:2,name:"Efectivo ($)",cur:"USD"}].forEach(c=>{if(!S.acc.some(a=>a.id===c.id)){const a={...c,initial:0,cash:1};S.acc.push(a);putDoc("c",a);ch=1}});
+  S.tx.forEach(t=>{if(!t.acc){t.acc=t.cur==="USD"?2:1;if(t.acc){putDoc("t",t);ch=1}}});
+  S.mov.forEach(m=>{if(m.k==="pr"&&!m.acc){m.acc=m.cur==="USD"?2:1;if(m.acc){putDoc("x",m);ch=1}}});
+  return ch}
+const prevYM=()=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+// El banco descuenta el mantenimiento al fin de cada mes: se registra solo, una vez por mes (id fijo = sin duplicados)
+function autoMant(){const t=hoy();let any=ensureCash();
+  S.acc.forEach(a=>{if(!(a.mant>0))return;let ch=0,[y,m]=(a.mantUp||prevYM()).split("-").map(Number);
+    for(let i=0;i<36;i++){m++;if(m>12){m=1;y++}
+      const last=y+"-"+String(m).padStart(2,"0")+"-"+String(new Date(y,m,0).getDate());
+      if(last>t)break;const r=rateFor(last);if(!(r>0))break;
+      const id=a.id*1000+((y-2020)*12+m);
+      if(!S.tx.some(x=>x.id===id))addTx({id,tipo:"gasto",amount:a.mant,cur:a.cur,cat:"Comisiones",desc:"Mantenimiento mensual · "+a.name,date:last,rate:r,acc:a.id,pm:"",auto:1});
+      a.mantUp=y+"-"+String(m).padStart(2,"0");ch=1}
+    if(ch){putDoc("c",a);any=1}});
+  if(any)render()}
+const feeFor=(a,c,r,pm)=>{const bs=c==="VES"?a:a*r,p=pm==="p2p"?S.com.p2p:S.com.p2c;return Math.round(Math.max(bs*p/100,S.com.min)*100)/100};
+const accById=id=>S.acc.find(a=>a.id===id),fd=d=>d.split("-").reverse().join("/");
+const DIR={recibi:"Me prestó",devuelvo:"Le devolví",preste:"Le presté",me_devuelven:"Me devolvió"};
+function E3(){const f=accById(+$("tfFrom").value),t=accById(+$("tfTo").value),a=parseFloat($("tfMon").value),r=rateFor($("tfFec").value);
+  $("tfEq").textContent=f&&t&&a>0&&f.cur!==t.cur&&r>0?"Llegarían "+(f.cur==="USD"?fmt(a*r,"VES"):fmt(a/r,"USD"))+" (tasa "+nr(r)+"). Si te acreditaron otro monto, escríbelo en 'Monto que llega'.":""}
+$("ft").onsubmit=e=>{e.preventDefault();
+  const f=accById(+$("tfFrom").value),t=accById(+$("tfTo").value);
+  if(!f||!t||f.id===t.id){say("Elige dos cuentas distintas. Si aún no las tienes, créalas arriba.");return}
+  const a=parseFloat($("tfMon").value),d=$("tfFec").value,r=rateFor(d);let rec=parseFloat($("tfRec").value);
+  if(!(rec>0)){if(f.cur===t.cur)rec=a;else{if(!(r>0)){say("Falta la tasa de ese día.");return}rec=f.cur==="USD"?a*r:a/r}}
+  const m={id:Date.now(),k:"tr",from:f.id,to:t.id,fcur:f.cur,tcur:t.cur,amount:a,rec:Math.round(rec*100)/100,rate:r,date:d};
+  S.mov.push(m);putDoc("x",m);$("tfMon").value="";$("tfRec").value="";$("tfEq").textContent="";render()};
+$("fl").onsubmit=e=>{e.preventDefault();const d=$("lFec").value,r=rateFor(d);
+  if(!(r>0)){say("Falta la tasa de ese día.");return}
+  const m={id:Date.now(),k:"pr",person:$("lPer").value.trim(),dir:$("lDir").value,acc:+$("lAcc").value||0,amount:parseFloat($("lMon").value),cur:$("lCur").value,rate:r,date:d};
+  S.mov.push(m);putDoc("x",m);$("lMon").value="";render()};
+$("movs").onclick=e=>{const b=e.target.closest("[data-dx]");if(!b)return;const id=+b.dataset.dx;S.mov=S.mov.filter(m=>m.id!==id);rmDoc("x",id);render()};
+$("fm").onsubmit=e=>{e.preventDefault();S.com={p2p:parseFloat($("cmP").value)||0,p2c:parseFloat($("cmC").value)||0,min:parseFloat($("cmM").value)||0};saveSettings();render()};
+function renderMov(){
+  const nm=id=>{const a=accById(id);return a?esc(a.name):"cuenta eliminada"};
+  const L=S.mov.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  $("movs").innerHTML=L.length?L.map(m=>m.k==="tr"?`<li><div><span class="d">Transferencia</span><small>${fd(m.date)} · ${nm(m.from)} → ${nm(m.to)}</small></div><div class="r">${fmt(m.amount,m.fcur)}${m.fcur!==m.tcur?" → "+fmt(m.rec,m.tcur):""}<button class="x" data-dx="${m.id}" aria-label="Eliminar">×</button></div></li>`:`<li><div><span class="d">${DIR[m.dir]} · ${esc(m.person)}</span><small>${fd(m.date)} · ${m.acc?nm(m.acc):"Sin cuenta"} · ≈ ${eqs(m)}</small></div><div class="r ${m.dir==="recibi"||m.dir==="me_devuelven"?"in":"out"}">${fmt(m.amount,m.cur)}<button class="x" data-dx="${m.id}" aria-label="Eliminar">×</button></div></li>`).join(""):'<li class="empty">Aún no hay transferencias ni préstamos.</li>';
+  const P={};S.mov.filter(m=>m.k==="pr").forEach(m=>{const k=m.person.toLowerCase(),o=P[k]||(P[k]={n:m.person,VES:0,USD:0});o[m.cur]+=(m.dir==="preste"||m.dir==="devuelvo"?1:-1)*m.amount});
+  const V=Object.values(P);
+  $("debts").innerHTML=V.length?V.map(o=>{const t=["VES","USD"].filter(c=>Math.abs(o[c])>=0.005).map(c=>o[c]>0?`<span class="in">Te debe ${fmt(o[c],c)}</span>`:`<span class="out">Le debes ${fmt(-o[c],c)}</span>`);return `<li><span class="d">${esc(o.n)}</span><span class="r">${t.length?t.join("<br>"):"Al día"}</span></li>`}).join(""):'<div class="empty">Cuando alguien te preste o le prestes, aquí verás cuánto falta por devolver.</div>'}
+const accN=t=>{const a=S.acc.find(x=>x.id===t.acc);return (a?" · "+esc(a.name):"")+(t.pm?" · pago móvil":"")};
+function fillSel(id,empty){const el=$(id),v=el.value;
+  el.innerHTML=(empty?'<option value="">Sin cuenta</option>':'')+[...S.acc].sort((a,b)=>(b.cash?1:0)-(a.cash?1:0)||a.id-b.id).map(a=>`<option value="${a.id}">${esc(a.name)}${a.cash?"":" ("+(a.cur==="USD"?"$":"Bs")+")"}</option>`).join("");
+  if(S.acc.some(a=>String(a.id)===v))el.value=v}
+function fillAcc(){fillSel("tAcc");fillSel("tfFrom");fillSel("tfTo");fillSel("lAcc");if($("tfTo").value===$("tfFrom").value&&S.acc[1])$("tfTo").value=S.acc[1].id}
+function renderAcc(){
+  const rt=rateFor(hoy());let bs=0,us=0;
+  $("accs").innerHTML=S.acc.length?S.acc.map(a=>{
+    let b=a.initial||0;
+    S.tx.forEach(t=>{if(t.acc===a.id)b+=(t.tipo==="ingreso"?1:-1)*conv(t,a.cur)});
+    S.mov.forEach(m=>{if(m.k==="tr"){if(m.from===a.id)b-=m.amount;if(m.to===a.id)b+=m.rec}else if(m.acc===a.id)b+=(m.dir==="recibi"||m.dir==="me_devuelven"?1:-1)*conv(m,a.cur)});
+    if(a.cur==="USD")us+=b;else bs+=b;
+    const alt=rt>0?(a.cur==="USD"?fmt(b*rt,"VES"):fmt(b/rt,"USD")):"";
+    return `<li><div><span class="d">${esc(a.name)}</span><small>Saldo inicial ${fmt(a.initial||0,a.cur)}${a.mant>0?" · Mantenimiento mensual "+fmt(a.mant,a.cur):""}</small></div><div class="r"><b class="${b<0?"out":""}">${fmt(b,a.cur)}</b>${alt?`<small>≈ ${alt}</small>`:""}<button class="x" data-ai="${a.id}" aria-label="Cambiar saldo inicial" title="Cambiar saldo inicial">✎</button>${a.cash?"":`<button class="x" data-am="${a.id}" aria-label="Mantenimiento mensual" title="Mantenimiento mensual">⚙</button><button class="x" data-ac="${a.id}" aria-label="Eliminar cuenta">×</button>`}</div></li>`}).join(""):'<div class="empty">Crea tus cuentas (por ejemplo Banco Mercantil, Banco de Venezuela, Efectivo $) con su saldo actual. Luego elige la cuenta en cada gasto o ingreso.</div>';
+  $("cBs").textContent=fmt(bs,"VES");$("cUsd").textContent=fmt(us,"USD");$("gBs").textContent=fmt(bs,"VES");$("gUsd").textContent=fmt(us,"USD");
+  $("cAll").textContent=rt>0?fmt(us+bs/rt,"USD")+" ≈ "+fmt(bs+us*rt,"VES"):"Falta la tasa del día";
+  $("gAll").textContent=S.acc.length?$("cAll").textContent:"Crea tus cuentas en la pestaña Cuentas";
+  if(!$("fm").contains(document.activeElement)){$("cmP").value=S.com.p2p;$("cmC").value=S.com.p2c;$("cmM").value=S.com.min}
+}
+$("fc").onsubmit=e=>{e.preventDefault();
+  const a={id:Date.now(),name:$("cNom").value.trim(),cur:$("cCur").value,initial:parseFloat($("cIni").value)||0,mant:parseFloat($("cMan").value)||0,mantUp:prevYM()};
+  S.acc.push(a);putDoc("c",a);e.target.reset();render()};
+$("accs").onclick=async e=>{
+  const ib=e.target.closest("[data-ai]");
+  if(ib){const a=accById(+ib.dataset.ai);if(!a)return;
+    const v=await askv("Saldo inicial de "+a.name+" en "+(a.cur==="USD"?"$":"Bs")+" (lo que tenías antes de empezar a registrar):",a.initial||0);
+    if(v===null)return;a.initial=parseFloat(String(v).replace(",","."))||0;putDoc("c",a);render();return}
+  const mb=e.target.closest("[data-am]");
+  if(mb){const a=accById(+mb.dataset.am);if(!a)return;
+    const v=await askv("Mantenimiento mensual en "+(a.cur==="USD"?"$":"Bs")+" que el banco descuenta a fin de mes (0 para quitarlo):",a.mant||0);
+    if(v===null)return;a.mant=Math.max(parseFloat(String(v).replace(",","."))||0,0);a.mantUp=prevYM();putDoc("c",a);render();return}
+  const b=e.target.closest("[data-ac]");if(!b)return;const id=+b.dataset.ac;
+  if(!await sure("¿Eliminar esta cuenta? Sus movimientos quedarán como 'Sin cuenta'."))return;
+  S.acc=S.acc.filter(a=>a.id!==id);rmDoc("c",id);render()};
+function renderInv(){
+  const v=S.view,o=v==="USD"?"VES":"USD";
+  let I=0,R=0,G=0,Io=0,Ro=0;
+  const hoyD=new Date();
+  $("invs").innerHTML=S.inv.length?S.inv.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(n=>{
+    const rs=S.ret.filter(r=>r.inv===n.id).sort((a,b)=>b.date.localeCompare(a.date));
+    const inv=conv(n,v),ret=rs.reduce((a,r)=>a+conv(r,v),0);
+    I+=inv;R+=ret;G+=Math.max(ret-inv,0);Io+=conv(n,o);Ro+=rs.reduce((a,r)=>a+conv(r,o),0);
+    const pct=inv?ret/inv*100:0,falta=inv-ret,ok=falta<=0;
+    let est="";
+    if(!ok&&rs.length){
+      const f=new Date(rs[rs.length-1].date+"T00:00:00");
+      const m=Math.max(1,(hoyD.getFullYear()-f.getFullYear())*12+hoyD.getMonth()-f.getMonth()+1);
+      est=` A tu ritmo (${fmt(ret/m,v)} por mes) lo repondrás en unos ${Math.ceil(falta/(ret/m))} meses.`;
+    }
+    return `<div class="inv"><div class="h"><b>${esc(n.name)}</b><button class="x" data-di="${n.id}" aria-label="Eliminar inversión">×</button></div>
+<small class="sub">${n.date.split("-").reverse().join("/")} · ${fmt(n.amount,n.cur)} ≈ ${eqs(n)} (tasa ${nr(n.rate)})${n.note?" · "+esc(n.note):""}</small>
+<div class="st">${ok?`<b class="in">Capital recuperado.</b> Ganancia de ${fmt(-falta,v)} (${num(pct-100)}% sobre lo invertido).`:`Retornado ${fmt(ret,v)} de ${fmt(inv,v)} (${num(pct)}%). <b class="out">Falta reponer ${fmt(falta,v)}.</b>${est}<br>Ganancia hasta ahora: ${fmt(0,v)}, porque primero se repone el capital.`}</div>
+<div class="bar"><i style="width:${Math.min(pct,100)}%"></i></div>
+<div class="rl">${rs.map(r=>`<div><span>${r.date.split("-").reverse().join("/")} · ${fmt(r.amount,r.cur)} ≈ ${eqs(r)}</span><button class="x" data-dr="${r.id}" aria-label="Eliminar retorno">×</button></div>`).join("")}</div>
+<form class="rf" data-id="${n.id}"><input name="m" type="number" step="0.01" min="0.01" inputmode="decimal" required placeholder="Monto del retorno" aria-label="Monto del retorno"><select name="c" aria-label="Moneda"><option value="USD">$</option><option value="VES">Bs</option></select><input name="f" type="date" value="${hoy()}" required aria-label="Fecha"><div class="sub eqr" style="grid-column:1/3;font-size:14px" aria-live="polite"></div><button class="go" type="submit">Registrar retorno</button></form></div>`}).join(""):'<div class="empty">Aún no hay inversiones. Registra lo que pusiste (equipos, insumos, capital) y luego sus retornos para ver cuánto falta por reponer.</div>';
+  $("iNet").textContent=fmt(R-I,v);$("iNet").className="big "+(R-I<0?"out":"in");
+  $("iAlt").textContent="≈ "+fmt(Ro-Io,o)+" a las tasas de cada movimiento";
+  $("iInv").textContent=fmt(I,v);$("iRet").textContent=fmt(R,v);$("iGan").textContent=fmt(G,v);$("iRep").textContent=fmt(Math.max(I-R,0),v);
+  $("iRoi").textContent=I?num((R-I)/I*100)+"%":"—";
+}
+$("fi").onsubmit=e=>{e.preventDefault();
+  if(!(rateFor(hoy())>0)){say("Primero escribe la tasa del día (Bs por $1) en la parte de arriba.");$("tasa").focus();return}
+  const n={id:Date.now(),name:$("iNom").value.trim(),amount:parseFloat($("iMon").value),cur:$("iCur").value,rate:rateFor($("iFec").value),date:$("iFec").value,note:$("iNota").value.trim()};
+  S.inv.push(n);putDoc("i",n);e.target.reset();$("iFec").value=hoy();render();
+};
+$("invs").onsubmit=e=>{e.preventDefault();const f=e.target;
+  if(!(rateFor(hoy())>0)){say("Primero escribe la tasa del día (Bs por $1).");$("tasa").focus();return}
+  const r={id:Date.now(),inv:+f.dataset.id,amount:parseFloat(f.elements.m.value),cur:f.elements.c.value,rate:rateFor(f.elements.f.value),date:f.elements.f.value};
+  S.ret.push(r);putDoc("r",r);render();
+};
+$("invs").onclick=async e=>{
+  const a=e.target.closest("[data-di]"),b=e.target.closest("[data-dr]");
+  if(a){const id=+a.dataset.di;if(!await sure("¿Eliminar esta inversión y todos sus retornos?"))return;
+    S.ret.filter(r=>r.inv===id).forEach(r=>rmDoc("r",r.id));S.ret=S.ret.filter(r=>r.inv!==id);S.inv=S.inv.filter(n=>n.id!==id);rmDoc("i",id);render()}
+  else if(b){const id=+b.dataset.dr;S.ret=S.ret.filter(r=>r.id!==id);rmDoc("r",id);render()}
+};
+$("invs").addEventListener("input",e=>{const f=e.target.closest(".rf");if(!f)return;
+  const a=parseFloat(f.elements.m.value),r=rateFor(f.elements.f.value),el=f.querySelector(".eqr");
+  el.textContent=a>0&&r>0?"Equivale a "+(f.elements.c.value==="USD"?fmt(a*r,"VES"):fmt(a/r,"USD"))+" (tasa "+nr(r)+")":""});
+function tab(t){["G","I","C"].forEach(k=>{$("v"+k).hidden=k!==t;$("tab"+k).setAttribute("aria-pressed",k===t)})}
+$("tabG").onclick=()=>tab("G");$("tabI").onclick=()=>tab("I");$("tabC").onclick=()=>tab("C");
+$("f").onsubmit=e=>{
+  e.preventDefault();
+  if(!(rateFor(hoy())>0)){say("Primero escribe la tasa del día (Bs por $1).");$("tasa").focus();return}
+  const tx={id:Date.now(),tipo,amount:parseFloat($("monto").value),cur:$("mon").value,cat:$("cat").value,desc:$("desc").value.trim(),date:$("fecha").value,rate:rateFor($("fecha").value),acc:+$("tAcc").value||0,pm:tipo==="gasto"?$("pm").value:""};
+  addTx(tx);
+  if(tx.pm)addTx({id:tx.id+1,tipo:"gasto",amount:feeFor(tx.amount,tx.cur,tx.rate,tx.pm),cur:"VES",cat:"Comisiones",desc:"Comisión pago móvil"+(tx.desc?" · "+tx.desc:""),date:tx.date,rate:tx.rate,acc:tx.acc,parent:tx.id,pm:""});
+  $("monto").value="";$("desc").value="";
+  $("mes").value=$("fecha").value.slice(0,7);render();$("monto").focus();
+};
+$("lista").onclick=e=>{const b=e.target.closest(".x");if(!b)return;delTx(b.dataset.id);render()};
+$("tasa").onchange=e=>{const v=parseFloat(e.target.value)||0;if(v>0)setRate(hoy(),v,"manual")};
+$("mes").onchange=render;
+$("vUSD").onclick=()=>{S.view="USD";saveSettings();render()};
+$("vVES").onclick=()=>{S.view="VES";saveSettings();render()};
+$("tG").onclick=()=>setTipo("gasto");$("tI").onclick=()=>setTipo("ingreso");
+const E1=()=>{eq("monto","mon","fecha","eq");const a=parseFloat($("monto").value),r=rateFor($("fecha").value),pm=$("pm").value;if(a>0&&r>0&&pm&&tipo==="gasto")$("eq").textContent+=($("eq").textContent?" · ":"")+"Comisión pago móvil: "+fmt(feeFor(a,$("mon").value,r,pm),"VES")},E2=()=>eq("iMon","iCur","iFec","iEq");
+["monto","mon","fecha","pm"].forEach(i=>$(i).addEventListener("input",E1));["iMon","iCur","iFec"].forEach(i=>$(i).addEventListener("input",E2));
+$("f").addEventListener("submit",()=>setTimeout(E1,0));$("fi").addEventListener("submit",()=>setTimeout(E2,0));
+$("fr").onsubmit=e=>{e.preventDefault();setRate($("rDate").value,parseFloat($("rVal").value),"manual");$("rVal").value=""};
+$("bcv").onclick=()=>bcv(false);
+$("bkE").onclick=()=>{S.bk=hoy();saveLocal();stat();const b=new Blob([JSON.stringify(S)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="finanzas-respaldo-"+hoy()+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
+$("bkI").onclick=()=>$("bkF").click();
+$("bkF").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.tx))throw 0;
+    if(!await sure("Esto reemplaza los datos que tienes ahora en este teléfono con los del respaldo. ¿Continuar?"))return;
+    S=Object.assign({rate:0,rates:{},acc:[],mov:[],com:{...COMD},tx:[],inv:[],ret:[],view:"USD"},d);saveLocal();stat();render();autoMant()}
+  catch(x){say("Ese archivo no es un respaldo válido.")}};
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+$("rDate").value=hoy();$("tfFec").value=hoy();$("lFec").value=hoy();["tfFrom","tfTo","tfMon","tfFec"].forEach(i=>$(i).addEventListener("input",E3));
+$("fecha").value=hoy();$("iFec").value=hoy();$("mes").value=hoy().slice(0,7);$("tasa").value=S.rate||"";
+cats();render();
+(async()=>{
+  const L=loadLocal();
+  try{
+    throw 0;
+    const uid=db&&user?await user.id():null;
+    if(!uid)throw 0;
+    col=db.collection("data/users/"+uid);
+    let first=true;
+    col.onSnapshot(snap=>{
+      const tx=[],inv=[],ret=[],rates={},acc=[],mov=[];let cfg=null;
+      snap.docs.forEach(d=>{const k=d.id[0];if(d.id==="settings")cfg=d.data();else if(k==="t")tx.push(d.data());else if(k==="i")inv.push(d.data());else if(k==="r")ret.push(d.data());else if(k==="c")acc.push(d.data());else if(k==="x")mov.push(d.data());else if(k==="d"){const x=d.data();rates[x.date]={r:x.rate,src:x.src}}});
+      if(first&&!tx.length&&L&&L.tx&&L.tx.length){ // migrar datos que estaban solo en este navegador
+        L.tx.forEach(t=>col.doc("t"+t.id).set(t));
+        if(!cfg&&L.rate)col.doc("settings").set({rate:L.rate,view:L.view||"USD"});
+      }
+      first=false;
+      S.tx=tx;S.inv=inv;S.ret=ret;S.rates=rates;S.acc=acc;S.mov=mov;
+      if(cfg){S.view=cfg.view||"USD";S.rate=cfg.rate||0;S.com=cfg.com||{...COMD}}
+      setStatus("Guardado en tu cuenta de Claude");render();
+    },()=>setStatus("Sin conexión con tus datos guardados.",1));
+  }catch(e){
+    if(L)S=Object.assign(S,L);
+    $("tasa").value=S.rate||"";
+    stat();render();autoMant();bcvAuto();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+ "name": "Mis finanzas Bs/USD",
+ "short_name": "Finanzas",
+ "description": "Control de gastos, cuentas e inversiones en bolívares y dólares",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#f2f4f1",
+ "theme_color": "#2c4a7a",
+ "lang": "es",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
