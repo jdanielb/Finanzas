@@ -117,6 +117,8 @@ li .r{text-align:right;white-space:nowrap}
       </div>
       <div class="sub" id="eq" style="font-size:14px;margin-top:-4px" aria-live="polite"></div>
       <label>Cuenta o efectivo<select id="tAcc"></select></label>
+      <label>¿Pertenece a una inversión?<select id="tInv"></select></label>
+      <label id="tInvNL" hidden>Nombre de la nueva inversión<input id="tInvN" maxlength="60" placeholder="Ej: equipo de ultrasonido"></label>
       <label id="pmL">Método de pago<select id="pm"><option value="">Efectivo, tarjeta u otro</option><option value="p2p">Pago móvil a una persona</option><option value="p2c">Pago móvil a un comercio</option></select></label>
       <label>Categoría<select id="cat"></select></label>
       <label>Descripción<input id="desc" maxlength="60" placeholder="Ej: mercado, gasolina"></label>
@@ -230,8 +232,8 @@ li .r{text-align:right;white-space:nowrap}
 </div>
 
 <script>
-const GAS=["Comida","Transporte","Servicios","Vivienda","Salud","Mascotas","Educación","Ocio","Negocio","Comisiones","Otros"];
-const ING=["Sueldo","Negocio","Otros ingresos"];
+const GAS=["Comida","Transporte","Servicios","Vivienda","Salud","Mascotas","Educación","Ocio","Negocio","Comisiones","Inversión","Otros"];
+const ING=["Sueldo","Negocio","Otros ingresos","Retorno de inversión"];
 const COMD={p2p:0.3,p2c:1.5,min:14};
 let S={rate:0,rates:{},acc:[],mov:[],com:{...COMD},tx:[],inv:[],ret:[],view:"USD"},tipo="gasto";
 const $=id=>document.getElementById(id);
@@ -279,20 +281,20 @@ const fmt=(n,c)=>(c==="USD"?"$ ":"Bs ")+num(n);
 // Convierte con la tasa vigente cuando se registró el movimiento
 function conv(t,to){if(t.cur===to)return t.amount;return to==="USD"?t.amount/t.rate:t.amount*t.rate}
 function cats(){$("cat").innerHTML=(tipo==="gasto"?GAS:ING).map(c=>`<option>${c}</option>`).join("")}
-function setTipo(t){tipo=t;$("pmL").hidden=t!=="gasto";if(t!=="gasto")$("pm").value="";$("tG").setAttribute("aria-pressed",t==="gasto");$("tI").setAttribute("aria-pressed",t==="ingreso");cats()}
+function setTipo(t){tipo=t;$("pmL").hidden=t!=="gasto";if(t!=="gasto")$("pm").value="";fillInv();$("tG").setAttribute("aria-pressed",t==="gasto");$("tI").setAttribute("aria-pressed",t==="ingreso");cats()}
 function render(){syncRate();
   const v=S.view,o=v==="USD"?"VES":"USD",m=$("mes").value;
   $("vUSD").setAttribute("aria-pressed",v==="USD");$("vVES").setAttribute("aria-pressed",v==="VES");
   const L=S.tx.filter(t=>t.date.startsWith(m)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
   let i=0,g=0,io=0,go=0;const por={};
-  L.forEach(t=>{const a=conv(t,v),b=conv(t,o);if(t.tipo==="ingreso"){i+=a;io+=b}else{g+=a;go+=b;por[t.cat]=(por[t.cat]||0)+a}});
+  L.forEach(t=>{if(t.inv)return;const a=conv(t,v),b=conv(t,o);if(t.tipo==="ingreso"){i+=a;io+=b}else{g+=a;go+=b;por[t.cat]=(por[t.cat]||0)+a}});
   $("bal").textContent=fmt(i-g,v);$("bal").className="big "+(i-g<0?"out":"");
   $("balAlt").textContent="≈ "+fmt(io-go,o)+" a las tasas de cada movimiento";
   $("ing").textContent=fmt(i,v);$("gas").textContent=fmt(g,v);
   const e=Object.entries(por).sort((a,b)=>b[1]-a[1]);
   $("cats").innerHTML=e.length?e.map(([c,x])=>`<div class="cat"><div class="t"><span>${esc(c)}</span><span>${fmt(x,v)} · ${Math.round(x/g*100)}%</span></div><div class="bar"><i style="width:${x/e[0][1]*100}%"></i></div></div>`).join(""):'<div class="empty">Aún no hay gastos este mes. Registra el primero en el formulario.</div>';
   $("lista").innerHTML=L.length?L.map(t=>`<li><div><span class="d">${esc(t.desc||t.cat)}</span><small>${t.date.split("-").reverse().join("/")} · ${esc(t.cat)}${accN(t)} · ${fmt(t.amount,t.cur)} ≈ ${eqs(t)} (tasa ${nr(t.rate)})</small></div><div class="r ${t.tipo==="ingreso"?"in":"out"}">${t.tipo==="ingreso"?"+":"−"}${fmt(conv(t,v),v)}<button class="x" data-id="${t.id}" aria-label="Eliminar movimiento">×</button></div></li>`).join(""):'<li class="empty">Sin movimientos en este mes.</li>';
-  renderInv();renderAcc();fillAcc();renderMov();
+  renderInv();renderAcc();fillAcc();fillInv();renderMov();
 }
 // El efectivo es una cuenta más (una en Bs y otra en $); lo que antes quedó "sin cuenta" pasa a efectivo
 function ensureCash(){let ch=0;
@@ -337,7 +339,13 @@ function renderMov(){
   const P={};S.mov.filter(m=>m.k==="pr").forEach(m=>{const k=m.person.toLowerCase(),o=P[k]||(P[k]={n:m.person,VES:0,USD:0});o[m.cur]+=(m.dir==="preste"||m.dir==="devuelvo"?1:-1)*m.amount});
   const V=Object.values(P);
   $("debts").innerHTML=V.length?V.map(o=>{const t=["VES","USD"].filter(c=>Math.abs(o[c])>=0.005).map(c=>o[c]>0?`<span class="in">Te debe ${fmt(o[c],c)}</span>`:`<span class="out">Le debes ${fmt(-o[c],c)}</span>`);return `<li><span class="d">${esc(o.n)}</span><span class="r">${t.length?t.join("<br>"):"Al día"}</span></li>`}).join(""):'<div class="empty">Cuando alguien te preste o le prestes, aquí verás cuánto falta por devolver.</div>'}
-const accN=t=>{const a=S.acc.find(x=>x.id===t.acc);return (a?" · "+esc(a.name):"")+(t.pm?" · pago móvil":"")};
+const invName=id=>{const n=S.inv.find(x=>x.id===id);return n?n.name:"inversión eliminada"};
+function fillInv(){const el=$("tInv"),v=el.value;
+  let h='<option value="">No</option>'+(tipo==="gasto"?'<option value="new">Sí, crear una inversión nueva…</option>':"");
+  h+=S.inv.map(n=>`<option value="${n.id}">${tipo==="gasto"?"Aporte a: ":"Retorno de: "}${esc(n.name)}</option>`).join("");
+  el.innerHTML=h;if([...el.options].some(o=>o.value===v))el.value=v;$("tInvNL").hidden=el.value!=="new"}
+$("tInv").onchange=()=>{$("tInvNL").hidden=$("tInv").value!=="new"};
+const accN=t=>{const a=S.acc.find(x=>x.id===t.acc);return (a?" · "+esc(a.name):"")+(t.pm?" · pago móvil":"")+(t.inv?" · "+(t.invK==="retorno"?"retorno de ":"aporte a ")+esc(invName(t.inv)):"")};
 function fillSel(id,empty){const el=$(id),v=el.value;
   el.innerHTML=(empty?'<option value="">Sin cuenta</option>':'')+[...S.acc].sort((a,b)=>(b.cash?1:0)-(a.cash?1:0)||a.id-b.id).map(a=>`<option value="${a.id}">${esc(a.name)}${a.cash?"":" ("+(a.cur==="USD"?"$":"Bs")+")"}</option>`).join("");
   if(S.acc.some(a=>String(a.id)===v))el.value=v}
@@ -377,20 +385,22 @@ function renderInv(){
   const hoyD=new Date();
   $("invs").innerHTML=S.inv.length?S.inv.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(n=>{
     const rs=S.ret.filter(r=>r.inv===n.id).sort((a,b)=>b.date.localeCompare(a.date));
-    const inv=conv(n,v),ret=rs.reduce((a,r)=>a+conv(r,v),0);
-    I+=inv;R+=ret;G+=Math.max(ret-inv,0);Io+=conv(n,o);Ro+=rs.reduce((a,r)=>a+conv(r,o),0);
+    const ls=S.tx.filter(t=>t.inv===n.id),ap=ls.filter(t=>t.invK==="aporte"),rt=ls.filter(t=>t.invK==="retorno"),sm=(L,c)=>L.reduce((a,x)=>a+conv(x,c),0);
+    const rl=[...rs,...rt].sort((a,b)=>b.date.localeCompare(a.date));
+    const inv=conv(n,v)+sm(ap,v),ret=sm(rs,v)+sm(rt,v);
+    I+=inv;R+=ret;G+=Math.max(ret-inv,0);Io+=conv(n,o)+sm(ap,o);Ro+=sm(rs,o)+sm(rt,o);
     const pct=inv?ret/inv*100:0,falta=inv-ret,ok=falta<=0;
     let est="";
-    if(!ok&&rs.length){
-      const f=new Date(rs[rs.length-1].date+"T00:00:00");
+    if(!ok&&rl.length){
+      const f=new Date(rl[rl.length-1].date+"T00:00:00");
       const m=Math.max(1,(hoyD.getFullYear()-f.getFullYear())*12+hoyD.getMonth()-f.getMonth()+1);
       est=` A tu ritmo (${fmt(ret/m,v)} por mes) lo repondrás en unos ${Math.ceil(falta/(ret/m))} meses.`;
     }
     return `<div class="inv"><div class="h"><b>${esc(n.name)}</b><button class="x" data-di="${n.id}" aria-label="Eliminar inversión">×</button></div>
-<small class="sub">${n.date.split("-").reverse().join("/")} · ${fmt(n.amount,n.cur)} ≈ ${eqs(n)} (tasa ${nr(n.rate)})${n.note?" · "+esc(n.note):""}</small>
+<small class="sub">${n.date.split("-").reverse().join("/")} · ${n.amount>0?fmt(n.amount,n.cur)+" ≈ "+eqs(n)+" (tasa "+nr(n.rate)+")":"Aportes desde Gastos"}${n.note?" · "+esc(n.note):""}</small>
 <div class="st">${ok?`<b class="in">Capital recuperado.</b> Ganancia de ${fmt(-falta,v)} (${num(pct-100)}% sobre lo invertido).`:`Retornado ${fmt(ret,v)} de ${fmt(inv,v)} (${num(pct)}%). <b class="out">Falta reponer ${fmt(falta,v)}.</b>${est}<br>Ganancia hasta ahora: ${fmt(0,v)}, porque primero se repone el capital.`}</div>
 <div class="bar"><i style="width:${Math.min(pct,100)}%"></i></div>
-<div class="rl">${rs.map(r=>`<div><span>${r.date.split("-").reverse().join("/")} · ${fmt(r.amount,r.cur)} ≈ ${eqs(r)}</span><button class="x" data-dr="${r.id}" aria-label="Eliminar retorno">×</button></div>`).join("")}</div>
+<div class="rl">${ap.map(t=>`<div><span>Aporte · ${fd(t.date)} · ${fmt(t.amount,t.cur)} ≈ ${eqs(t)} (desde Gastos)</span><span></span></div>`).join("")}${rt.map(t=>`<div><span>Retorno · ${fd(t.date)} · ${fmt(t.amount,t.cur)} ≈ ${eqs(t)} (desde Ingresos)</span><span></span></div>`).join("")}${rs.map(r=>`<div><span>${r.date.split("-").reverse().join("/")} · ${fmt(r.amount,r.cur)} ≈ ${eqs(r)}</span><button class="x" data-dr="${r.id}" aria-label="Eliminar retorno">×</button></div>`).join("")}</div>
 <form class="rf" data-id="${n.id}"><input name="m" type="number" step="0.01" min="0.01" inputmode="decimal" required placeholder="Monto del retorno" aria-label="Monto del retorno"><select name="c" aria-label="Moneda"><option value="USD">$</option><option value="VES">Bs</option></select><input name="f" type="date" value="${hoy()}" required aria-label="Fecha"><div class="sub eqr" style="grid-column:1/3;font-size:14px" aria-live="polite"></div><button class="go" type="submit">Registrar retorno</button></form></div>`}).join(""):'<div class="empty">Aún no hay inversiones. Registra lo que pusiste (equipos, insumos, capital) y luego sus retornos para ver cuánto falta por reponer.</div>';
   $("iNet").textContent=fmt(R-I,v);$("iNet").className="big "+(R-I<0?"out":"in");
   $("iAlt").textContent="≈ "+fmt(Ro-Io,o)+" a las tasas de cada movimiento";
@@ -409,8 +419,8 @@ $("invs").onsubmit=e=>{e.preventDefault();const f=e.target;
 };
 $("invs").onclick=async e=>{
   const a=e.target.closest("[data-di]"),b=e.target.closest("[data-dr]");
-  if(a){const id=+a.dataset.di;if(!await sure("¿Eliminar esta inversión y todos sus retornos?"))return;
-    S.ret.filter(r=>r.inv===id).forEach(r=>rmDoc("r",r.id));S.ret=S.ret.filter(r=>r.inv!==id);S.inv=S.inv.filter(n=>n.id!==id);rmDoc("i",id);render()}
+  if(a){const id=+a.dataset.di;if(!await sure("¿Eliminar esta inversión y sus retornos? Los gastos e ingresos vinculados quedarán como movimientos normales del mes."))return;
+    S.tx.filter(t=>t.inv===id).forEach(t=>{t.inv=0;t.invK="";putDoc("t",t)});S.ret.filter(r=>r.inv===id).forEach(r=>rmDoc("r",r.id));S.ret=S.ret.filter(r=>r.inv!==id);S.inv=S.inv.filter(n=>n.id!==id);rmDoc("i",id);render()}
   else if(b){const id=+b.dataset.dr;S.ret=S.ret.filter(r=>r.id!==id);rmDoc("r",id);render()}
 };
 $("invs").addEventListener("input",e=>{const f=e.target.closest(".rf");if(!f)return;
@@ -422,9 +432,14 @@ $("f").onsubmit=e=>{
   e.preventDefault();
   if(!(rateFor(hoy())>0)){say("Primero escribe la tasa del día (Bs por $1).");$("tasa").focus();return}
   const tx={id:Date.now(),tipo,amount:parseFloat($("monto").value),cur:$("mon").value,cat:$("cat").value,desc:$("desc").value.trim(),date:$("fecha").value,rate:rateFor($("fecha").value),acc:+$("tAcc").value||0,pm:tipo==="gasto"?$("pm").value:""};
+  const iv=$("tInv").value;
+  if(iv==="new"){const nm=$("tInvN").value.trim();if(!nm){say("Escribe el nombre de la nueva inversión.");return}
+    const n={id:tx.id+2,name:nm,amount:0,cur:tx.cur,rate:tx.rate,date:tx.date,note:"Creada desde un gasto"};
+    S.inv.push(n);putDoc("i",n);tx.inv=n.id;tx.invK="aporte";tx.cat="Inversión"}
+  else if(iv){tx.inv=+iv;tx.invK=tipo==="gasto"?"aporte":"retorno";tx.cat=tipo==="gasto"?"Inversión":"Retorno de inversión"}
   addTx(tx);
   if(tx.pm)addTx({id:tx.id+1,tipo:"gasto",amount:feeFor(tx.amount,tx.cur,tx.rate,tx.pm),cur:"VES",cat:"Comisiones",desc:"Comisión pago móvil"+(tx.desc?" · "+tx.desc:""),date:tx.date,rate:tx.rate,acc:tx.acc,parent:tx.id,pm:""});
-  $("monto").value="";$("desc").value="";
+  $("monto").value="";$("desc").value="";$("tInvN").value="";$("tInv").value="";$("tInvNL").hidden=true;
   $("mes").value=$("fecha").value.slice(0,7);render();$("monto").focus();
 };
 $("lista").onclick=e=>{const b=e.target.closest(".x");if(!b)return;delTx(b.dataset.id);render()};
